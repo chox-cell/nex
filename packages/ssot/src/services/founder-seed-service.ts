@@ -162,7 +162,12 @@ export class FounderSeedService {
     }
 
     await this.bootstrapLegacyEventsIfNeeded(workspace.id);
-    await this.sync.refreshSprintScope(sprint.id);
+    
+    // Safety check for sprint existence before sync
+    const sprintExists = await this.sprints.getById(sprint.id);
+    if (sprintExists) {
+      await this.sync.refreshSprintScope(sprint.id);
+    }
 
     return {
       workspaceId: workspace.id,

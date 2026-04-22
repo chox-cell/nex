@@ -310,7 +310,11 @@ export class ProjectionService {
   }
 
   private async buildSprintProjectionState(sprintId: string): Promise<SprintProjectionState> {
-    const { sprint, project, workspaceId } = await this.scopeResolver.resolveSprint(sprintId);
+    const scope = await this.scopeResolver.resolveSprint(sprintId);
+    if (!scope) {
+      throw new Error(`Sprint ${sprintId} was not found during projection build.`);
+    }
+    const { sprint, project, workspaceId } = scope;
     const phases = await this.phases.listBySprint(sprint.id);
     const tasks = await this.tasks.listByPhases(phases.map((phase) => phase.id));
     const taskStates = await Promise.all(tasks.map((task) => this.buildTaskProjectionState(task.id)));

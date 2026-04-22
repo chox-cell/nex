@@ -63,17 +63,17 @@ export class TaskScopeService {
     };
   }
 
-  async resolveSprint(sprintId: string): Promise<ResolvedSprintScope> {
+  async resolveSprint(sprintId: string): Promise<ResolvedSprintScope | null> {
     const sprint = await this.sprints.getById(sprintId);
 
     if (!sprint) {
-      throw new Error(`Sprint ${sprintId} was not found.`);
+      return null;
     }
 
     const project = await this.projects.getById(sprint.projectId);
 
     if (!project) {
-      throw new Error(`Project ${sprint.projectId} was not found.`);
+      return null;
     }
 
     return {
