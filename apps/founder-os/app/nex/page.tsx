@@ -1,11 +1,10 @@
 import Link from "next/link";
-
 import { Panel } from "../../src/components/panel";
 import { StateBadge } from "../../src/components/state-badge";
 import { ensureNexSeed, nexRuntime } from "../../src/lib/nex-runtime";
 
 export default async function NexWorkspacePage() {
-  await ensureNexSeed();
+  const seed = await ensureNexSeed();
 
   const [mission, toolRegistry] = await Promise.all([
     nexRuntime.services.mission.getFounderSummary(),
@@ -21,191 +20,87 @@ export default async function NexWorkspacePage() {
   const activeSprint = activeProject?.project.currentSprintId
     ? await nexRuntime.repositories.sprints.getById(activeProject.project.currentSprintId)
     : null;
-  const sprintDetail = activeSprint ? await nexRuntime.services.execution.getSprintDetail(activeSprint.id) : null;
   const sprintProjection = activeSprint ? await nexRuntime.services.projections.refreshSprintProjection(activeSprint.id) : null;
-  const currentTask =
-    sprintDetail?.phases.flatMap((phase) => phase.tasks).find((task) => task.status !== "DONE" && task.status !== "FAIL") ?? null;
-  const currentTaskPacket = currentTask ? await nexRuntime.services.resumePackets.getTaskPacket(currentTask.id) : null;
 
   return (
-    <div className="page-grid">
+    <div>
       <header className="route-header">
-        <div>
-          <p className="route-kicker">Founder workspace</p>
-          <h1>NEX Founder Workspace</h1>
-          <p className="route-copy">
-            Mission, execution, memory, truth, and the tool registry now read from the same canonical founder workspace. This surface remains
-            grounded in persisted state, not chat memory or mocked control widgets.
-          </p>
-        </div>
+        <p className="route-kicker">Operating Shell</p>
+        <h1>Workspace</h1>
+        <p className="route-copy">
+          The unified control layer for your mission. Projects, tools, and memory are unified into a single execution spine.
+        </p>
       </header>
 
-      <section className="metric-grid">
-        <article className="metric-card">
-          <span className="panel-eyebrow">Strategic priorities</span>
-          <strong>{mission.priorities.length}</strong>
-          <p>Ranked priorities persisted under the founder workspace.</p>
-        </article>
-        <article className="metric-card">
-          <span className="panel-eyebrow">Plans</span>
-          <strong>{(await nexRuntime.repositories.plans.listByWorkspace(mission.workspace.id)).length}</strong>
-          <p>Versioned plans available for conversion to execution.</p>
-        </article>
-        <article className="metric-card">
-          <span className="panel-eyebrow">Projects</span>
-          <strong>{projects.length}</strong>
-          <p>Execution containers currently tracked inside NEX.</p>
-        </article>
-        <article className="metric-card">
-          <span className="panel-eyebrow">Tool providers</span>
-          <strong>{toolRegistry?.providers.length ?? 0}</strong>
-          <p>Seeded founder work surfaces now tracked inside NEX.</p>
-        </article>
-      </section>
-
-      <div className="page-grid two">
-        <Panel
-          eyebrow="Mission layer"
-          title={mission.workspace.name}
-          description="Founder workspace persists operational truth and anchors every plan and execution object."
-        >
-          <dl className="detail-list">
+      <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '2rem', marginBottom: '2.5rem' }}>
+        <Panel eyebrow="Strategic Mission" title={mission.workspace.name || "UNNAMED_WORKSPACE"} zone="strategy">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <div>
-              <dt>Workspace slug</dt>
-              <dd className="mono">{mission.workspace.slug}</dd>
+              <p style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Core Vision</p>
+              <p style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--text-ivory)' }}>{mission.vision?.title || "Establishing baseline vision."}</p>
             </div>
-            <div>
-              <dt>Status</dt>
-              <dd>
-                <StateBadge status={mission.workspace.status} />
-              </dd>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+              <div>
+                <p style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>System Status</p>
+                <StateBadge status={mission.workspace.status || "IDLE"} />
+              </div>
+              <div>
+                <p style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Operational Region</p>
+                <p style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--text-silver)' }}>{mission.workspace.timezone || "GLOBAL_CLUSTER"}</p>
+              </div>
             </div>
-            <div>
-              <dt>Timezone</dt>
-              <dd>{mission.workspace.timezone}</dd>
-            </div>
-            <div>
-              <dt>Active vision</dt>
-              <dd>{mission.vision?.title ?? "No active vision"}</dd>
-            </div>
-          </dl>
+          </div>
         </Panel>
 
-        <Panel eyebrow="Current execution" title={activeProject?.project.name ?? "No active project"} description="Current operational focus projected from the execution spine.">
+        <Panel eyebrow="Execution Focus" title={activeProject?.project.name || "IDLE_STATE"} zone="action">
           {activeProject ? (
-            <dl className="detail-list">
-              <div>
-                <dt>Project status</dt>
-                <dd>
-                  <StateBadge status={activeProject.project.status} />
-                </dd>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div>
+                  <p style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Active Sprint</p>
+                  <p style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-ivory)' }}>{activeSprint?.name || "Initializing..."}</p>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  <p style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Truth Velocity</p>
+                  <p style={{ fontSize: '1.4rem', fontWeight: 900, color: 'var(--bronze)' }}>{sprintProjection?.progressScore.toFixed(1) || "0.0"}%</p>
+                </div>
               </div>
-              <div>
-                <dt>Active sprint</dt>
-                <dd>{activeSprint?.name ?? "No sprint linked yet"}</dd>
+              <div style={{ padding: '1rem', background: 'var(--bg-obsidian)', borderRadius: 'var(--radius-m)', border: '1px solid var(--border-strong)' }}>
+                <p style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--bronze)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Next Required Move</p>
+                <p style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-ivory)', lineHeight: '1.4' }}>{sprintProjection?.nextRequiredAction || "Maintain current vector."}</p>
               </div>
-              <div>
-                <dt>Current task</dt>
-                <dd>{currentTask?.title ?? "No active task found"}</dd>
-              </div>
-              <div>
-                <dt>Next move</dt>
-                <dd>{currentTaskPacket?.nextRequiredAction ?? sprintProjection?.nextRequiredAction ?? "Convert a plan into a sprint."}</dd>
-              </div>
-              <div>
-                <dt>Truth progress</dt>
-                <dd>{sprintProjection ? `${sprintProjection.progressScore.toFixed(2)}%` : "No projection yet"}</dd>
-              </div>
-              <div>
-                <dt>Last proof</dt>
-                <dd>{sprintProjection?.lastProof ?? "No proof attached yet"}</dd>
-              </div>
-            </dl>
+              <Link href="/nex/command-center" className="os-button" style={{ width: '100%' }}>ENTER_COMMAND_CENTER</Link>
+            </div>
           ) : (
-            <p className="empty-state">No active project is available yet.</p>
+            <div style={{ padding: '3rem 0', textAlign: 'center' }}>
+              <p style={{ color: 'var(--text-dim)', fontSize: '0.9rem' }}>No active projects in the execution spine.</p>
+              <Link href="/nex/projects" className="os-button" style={{ marginTop: '1.5rem' }}>INITIALIZE_PROJECT</Link>
+            </div>
           )}
         </Panel>
       </div>
 
-      <div className="page-grid two">
-        <Panel eyebrow="Strategic priorities" title="Ranked founder priorities">
-          <div className="stack-list">
-            {mission.priorities.map((priority) => (
-              <article className="stack-card" key={priority.id}>
-                <header>
-                  <div>
-                    <h3>
-                      {priority.rank}. {priority.title}
-                    </h3>
-                    <p>{priority.rationale}</p>
-                  </div>
-                  <StateBadge status={priority.status} />
-                </header>
-              </article>
-            ))}
-          </div>
-        </Panel>
-
-        <Panel eyebrow="Objectives + decisions" title="Mission control context">
-          <div className="stack-list">
-            {mission.objectives.map((objective) => (
-              <article className="stack-card" key={objective.id}>
-                <header>
-                  <div>
-                    <h3>{objective.title}</h3>
-                    <p>{objective.targetOutcome}</p>
-                  </div>
-                  <StateBadge status={objective.status} />
-                </header>
-              </article>
-            ))}
-            {mission.decisions.map((decision) => (
-              <article className="stack-card" key={decision.id}>
-                <header>
-                  <div>
-                    <h3>{decision.title}</h3>
-                    <p>{decision.summary}</p>
-                  </div>
-                  <StateBadge status={decision.status} />
-                </header>
-              </article>
-            ))}
-          </div>
-        </Panel>
-      </div>
-
-      <Panel eyebrow="Operating surfaces" title="Current founder routes">
-        <div className="link-list">
-          <Link className="link-card" href="/nex/plans">
-            Open Plan Center
-          </Link>
-          <Link className="link-card" href="/nex/projects">
-            Open Project Board
-          </Link>
-          <Link className="link-card" href="/nex/tools">
-            Open Tool Registry
-          </Link>
-          <Link className="link-card" href="/nex/memory">
-            Open Memory Timeline
-          </Link>
-          <Link className="link-card" href="/nex/proof">
-            Open Proof Vault
-          </Link>
-          <Link className="link-card" href="/nex/gates">
-            Open Gates & Blockers
-          </Link>
-          {activeSprint ? (
-            <Link className="link-card" href={`/nex/sprints/${activeSprint.id}`}>
-              Review active sprint
+      <section>
+        <h2 style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1.5rem' }}>
+          Operational Surfaces
+        </h2>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
+          {[
+            { href: "/nex/command-center", label: "Command Center", desc: "Live operational cockpit and urgency layer." },
+            { href: "/nex/plans", label: "Strategic Plans", desc: "Versioned execution blueprints." },
+            { href: "/nex/projects", label: "Execution Board", desc: "Active project boards and sprint tracking." },
+            { href: "/nex/tools", label: "Tool Registry", desc: "Founder tool and automation inventory." },
+            { href: "/nex/memory", label: "Memory Timeline", desc: "Canonical event and decision history." },
+            { href: "/nex/proof", label: "Proof Vault", desc: "Verified truth artifacts and evidence." },
+          ].map((link) => (
+            <Link key={link.href} href={link.href} className="plan-card" style={{ borderLeft: '3px solid var(--border-strong)' }}>
+              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--text-ivory)' }}>{link.label}</h3>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-graphite)', lineHeight: '1.5' }}>{link.desc}</p>
+              <div style={{ marginTop: '1.25rem', fontSize: '0.7rem', fontWeight: 800, color: 'var(--bronze)', textTransform: 'uppercase' }}>OPEN_SURFACE →</div>
             </Link>
-          ) : null}
-          {currentTask ? (
-            <Link className="link-card" href={`/nex/tasks/${currentTask.id}`}>
-              Inspect current task runtime
-            </Link>
-          ) : null}
+          ))}
         </div>
-      </Panel>
+      </section>
     </div>
   );
 }

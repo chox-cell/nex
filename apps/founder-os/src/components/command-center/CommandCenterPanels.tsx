@@ -1,203 +1,117 @@
 import { Panel } from "../panel";
 import { StateBadge } from "../state-badge";
-import type { CommandCenterSummary } from "@nex/ssot";
 
-export function ActiveMissionPanel({ mission }: { mission: CommandCenterSummary["mission"] }) {
-  return (
-    <Panel eyebrow="Active Mission" title={mission.title} description="Current operational focus and vision anchoring.">
-      <dl className="detail-list">
-        <div>
-          <dt>Objective</dt>
-          <dd>{mission.objective}</dd>
-        </div>
-        <div>
-          <dt>Strategic Focus</dt>
-          <dd>{mission.strategicFocus}</dd>
-        </div>
-      </dl>
-    </Panel>
-  );
+// Real interface from CommandCenterService
+export interface CommandCenterSummary {
+  mission: { title: string; objective: string; strategicFocus: string; };
+  priorities: { title: string; status: string; rank: number; }[];
+  project: { name: string; status: string; riskLevel: string; progressScore: number; progressSummary: string; } | null;
+  sprint: { name: string; status: string; progressScore: number; phaseSummary: string; } | null;
+  task: { name: string; status: string; blockerState: string; dependencySummary: string; } | null;
+  ownerTool: { name: string; providerType: string; status: string; readiness: string; } | null;
+  blockers: { text: string; context: string; }[];
+  lastVerifiedProof: string | null;
+  nextRequiredMove: { action: string; reason: string; };
 }
 
-export function StrategicPrioritiesPanel({ priorities }: { priorities: CommandCenterSummary["priorities"] }) {
+interface PanelProps {
+  summary: CommandCenterSummary;
+}
+
+export function NextMovePanel({ summary }: PanelProps) {
   return (
-    <Panel eyebrow="Strategic Priorities" title="Ranked priorities" description="Ranked objectives currently tracked in the workspace.">
-      <div className="stack-list">
-        {priorities.map((p) => (
-          <article key={p.title} className="stack-card">
-            <header>
-              <div>
-                <h3 className="mono">{p.rank}. {p.title}</h3>
-              </div>
-              <StateBadge status={p.status} />
-            </header>
-          </article>
-        ))}
+    <Panel eyebrow="Strategic Execution" title="Next Required Move" zone="action">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        <p style={{ fontSize: '1.2rem', fontWeight: 600, color: 'var(--text-ivory)', lineHeight: '1.5' }}>
+          {summary.nextRequiredMove.action}
+        </p>
+        <p style={{ fontSize: '0.85rem', color: 'var(--text-graphite)' }}>Strategic move derived from active execution state.</p>
+        <div style={{ display: 'flex', gap: '0.75rem', marginTop: '0.5rem' }}>
+           <button className="os-button" style={{ flex: 1 }}>EXECUTE_NOW</button>
+           <button className="action-trigger" style={{ padding: '0.85rem' }}>DELEGATE</button>
+        </div>
       </div>
     </Panel>
   );
 }
 
-export function ProjectSummaryPanel({ project }: { project: CommandCenterSummary["project"] }) {
-  if (!project) {
-    return (
-      <Panel eyebrow="Current Project" title="No Active Project" description="Operational execution container.">
-        <p className="empty-state">No active project found. Choose or create a project to begin execution.</p>
-      </Panel>
-    );
-  }
+export function TaskFocusPanel({ summary }: PanelProps) {
+  const task = summary.task;
+  if (!task) return null;
 
   return (
-    <Panel eyebrow="Current Project" title={project.name} description="Current execution container tracked in NEX.">
-      <dl className="detail-list">
-        <div>
-          <dt>Status</dt>
-          <dd><StateBadge status={project.status} /></dd>
+    <Panel eyebrow="Active Runtime" title="Current Focus" zone="action">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--bronze)' }}>{task.name.toUpperCase()}</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
+              <span style={{ color: 'var(--text-graphite)' }}>Status</span>
+              <span style={{ fontWeight: 700 }}>{task.status}</span>
+           </div>
+           <p style={{ fontSize: '0.8rem', color: 'var(--text-silver)' }}>{task.dependencySummary}</p>
         </div>
-        <div>
-          <dt>Risk Level</dt>
-          <dd>{project.riskLevel}</dd>
-        </div>
-        <div>
-          <dt>Progress Truth</dt>
-          <dd>{project.progressSummary}</dd>
-        </div>
-      </dl>
+      </div>
     </Panel>
   );
 }
 
-export function SprintSummaryPanel({ sprint }: { sprint: CommandCenterSummary["sprint"] }) {
-  if (!sprint) {
-    return (
-      <Panel eyebrow="Current Sprint" title="No Active Sprint" description="Current iteration of truth closure.">
-        <p className="empty-state">No active sprint found. Convert a plan to a sprint to continue.</p>
-      </Panel>
-    );
-  }
-
+export function BlockerPanel({ summary }: PanelProps) {
   return (
-    <Panel eyebrow="Current Sprint" title={sprint.name} description="Current iteration of truth closure.">
-      <dl className="detail-list">
-        <div>
-          <dt>Status</dt>
-          <dd><StateBadge status={sprint.status} /></dd>
-        </div>
-        <div>
-          <dt>Phase Summary</dt>
-          <dd>{sprint.phaseSummary}</dd>
-        </div>
-        <div>
-          <dt>Truth Progress</dt>
-          <dd className="mono">{sprint.progressScore.toFixed(2)}%</dd>
-        </div>
-      </dl>
-    </Panel>
-  );
-}
-
-export function TaskFocusPanel({ task }: { task: CommandCenterSummary["task"] }) {
-  if (!task) {
-    return (
-      <Panel eyebrow="Current Task" title="No Active Task" description="Immediate operational focus.">
-        <p className="empty-state">No active task found.</p>
-      </Panel>
-    );
-  }
-
-  return (
-    <Panel eyebrow="Current Task" title={task.name} description="Immediate operational focus.">
-      <dl className="detail-list">
-        <div>
-          <dt>State</dt>
-          <dd><StateBadge status={task.status} /></dd>
-        </div>
-        <div>
-          <dt>Blocker State</dt>
-          <dd>{task.blockerState}</dd>
-        </div>
-        <div>
-          <dt>Dependencies</dt>
-          <dd>{task.dependencySummary}</dd>
-        </div>
-      </dl>
-    </Panel>
-  );
-}
-
-export function OwnerToolPanel({ ownerTool }: { ownerTool: CommandCenterSummary["ownerTool"] }) {
-  if (!ownerTool) {
-    return (
-      <Panel eyebrow="Owner Tool" title="No Tool Assigned" description="Assigned tool or provider for the current task.">
-        <p className="empty-state">No active tool assigned to current task.</p>
-      </Panel>
-    );
-  }
-
-  return (
-    <Panel eyebrow="Owner Tool" title={ownerTool.name} description="Assigned tool or provider for the current task.">
-      <dl className="detail-list">
-        <div>
-          <dt>Provider Type</dt>
-          <dd className="mono">{ownerTool.providerType}</dd>
-        </div>
-        <div>
-          <dt>Status</dt>
-          <dd><StateBadge status={ownerTool.status} /></dd>
-        </div>
-        <div>
-          <dt>Readiness</dt>
-          <dd>{ownerTool.readiness}</dd>
-        </div>
-      </dl>
-    </Panel>
-  );
-}
-
-export function BlockersPanel({ blockers }: { blockers: CommandCenterSummary["blockers"] }) {
-  return (
-    <Panel eyebrow="Blockers" title="Operational Stalls" description="Actual open blockers detected in the truth layer.">
-      {blockers.length === 0 ? (
-        <p className="empty-state">No open blockers detected. Execution path is clear.</p>
-      ) : (
-        <div className="stack-list">
-          {blockers.map((b, i) => (
-            <article key={i} className="stack-card">
-              <header>
-                <div>
-                  <h3 className="mono">{b.text}</h3>
-                  <p className="panel-description" style={{ marginTop: '0.4rem', fontSize: '0.8rem' }}>{b.context}</p>
-                </div>
-              </header>
-            </article>
+    <Panel eyebrow="Operational Health" title="Active Blockers" zone="action">
+      {summary.blockers.length > 0 ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          {summary.blockers.map((blocker, i) => (
+            <div key={i} style={{ padding: '0.75rem', background: 'rgba(239, 68, 68, 0.05)', borderLeft: '3px solid var(--danger)', borderRadius: 'var(--radius-m)' }}>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-ivory)', fontWeight: 500 }}>{blocker.text}</p>
+              <p style={{ fontSize: '0.7rem', color: 'var(--text-dim)', marginTop: '0.25rem' }}>{blocker.context}</p>
+            </div>
           ))}
+          <button className="os-button" style={{ background: 'var(--danger)', color: '#fff', marginTop: '0.5rem' }}>RESOLVE_ALL</button>
+        </div>
+      ) : (
+        <div style={{ textAlign: 'center', padding: '2rem 0' }}>
+          <p style={{ color: 'var(--text-graphite)', fontSize: '0.85rem' }}>No blockers detected in the execution spine.</p>
         </div>
       )}
     </Panel>
   );
 }
 
-export function VerifiedProofPanel({ lastProof }: { lastProof: string | null }) {
+export function ContextPanel({ summary }: PanelProps) {
   return (
-    <Panel eyebrow="Last Verified Proof" title="Truth Record" description="Latest real evidence or verification-linked proof.">
-      <div className="proof-display">
-        {lastProof ? (
-          <code className="mono-block">{lastProof}</code>
-        ) : (
-          <p className="empty-state">No verified proof records found in current execution context.</p>
-        )}
+    <Panel eyebrow="Execution Context" title="Active Envelope" zone="context">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div>
+          <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase' }}>Current Sprint</span>
+          <p style={{ fontSize: '1rem', fontWeight: 600 }}>{summary.sprint?.name || "N/A"}</p>
+          {summary.sprint && <p style={{ fontSize: '0.8rem', color: 'var(--text-graphite)' }}>{summary.sprint.phaseSummary}</p>}
+        </div>
+        <div>
+          <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase' }}>Active Project</span>
+          <p style={{ fontSize: '1rem', fontWeight: 600 }}>{summary.project?.name || "N/A"}</p>
+          {summary.project && <p style={{ fontSize: '0.8rem', color: 'var(--text-graphite)' }}>{summary.project.progressSummary}</p>}
+        </div>
+        <div>
+          <span style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase' }}>Owner Tool</span>
+          <p style={{ fontSize: '0.9rem', color: 'var(--bronze)', fontWeight: 700 }}>
+            {summary.ownerTool ? `${summary.ownerTool.name} [${summary.ownerTool.readiness}]` : "UNASSIGNED"}
+          </p>
+        </div>
       </div>
     </Panel>
   );
 }
 
-export function NextMovePanel({ nextMove }: { nextMove: CommandCenterSummary["nextRequiredMove"] }) {
+export function MissionPanel({ summary }: PanelProps) {
   return (
-    <Panel eyebrow="Next Required Move" title={nextMove.action} description="Deterministic rule-driven instruction.">
-      <div className="next-move-context">
-        <p className="next-move-reason"><strong>Reason:</strong> {nextMove.reason}</p>
-        <div className="next-move-action-indicator">
-          <span>REQUIRED ACTION</span>
+    <Panel eyebrow="Strategic Alignment" title="North Star" zone="strategy">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <p style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-silver)', lineHeight: '1.6', fontStyle: 'italic' }}>
+          "{summary.mission.objective}"
+        </p>
+        <div style={{ padding: '1rem', background: 'var(--bg-obsidian)', borderRadius: 'var(--radius-m)', border: '1px solid var(--border)' }}>
+           <p style={{ fontSize: '0.7rem', fontWeight: 800, color: 'var(--text-dim)', marginBottom: '0.5rem' }}>STRATEGIC_FOCUS</p>
+           <p style={{ fontSize: '0.9rem', fontWeight: 600 }}>{summary.mission.strategicFocus}</p>
         </div>
       </div>
     </Panel>

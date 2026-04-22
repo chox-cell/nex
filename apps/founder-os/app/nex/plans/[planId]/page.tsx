@@ -32,107 +32,134 @@ export default async function PlanDetailPage({ params }: PlanDetailPageProps) {
           <StateBadge status={detail.plan.status} />
         </header>
 
-        <div className="page-grid two">
-          <Panel eyebrow="Update plan" title="Append a new version snapshot">
+        <div className="form-grid-2">
+          <Panel eyebrow="Strategic Update" title="Plan Snapshot">
             <form action={updatePlanAction} className="form-stack">
               <input name="planId" type="hidden" value={detail.plan.id} />
-              <label>
-                Plan name
-                <input className="input" defaultValue={detail.plan.name} name="name" required />
-              </label>
-              <label>
-                Goal
-                <textarea className="textarea" defaultValue={detail.plan.goal} name="goal" required />
-              </label>
-              <div className="form-grid">
-                <label>
-                  Status
-                  <select className="select" defaultValue={detail.plan.status} name="status" required>
+              
+              <div className="input-group">
+                <label className="input-label">Identification</label>
+                <input className="os-input" defaultValue={detail.plan.name} name="name" required />
+              </div>
+
+              <div className="input-group">
+                <label className="input-label">Primary Objective</label>
+                <textarea 
+                  className="os-textarea" 
+                  defaultValue={detail.plan.goal} 
+                  name="goal" 
+                  style={{ minHeight: '120px' }}
+                  required 
+                />
+              </div>
+
+              <div className="form-grid-2">
+                <div className="input-group">
+                  <label className="input-label">Governance State</label>
+                  <select className="os-select" defaultValue={detail.plan.status} name="status" required>
                     <option value="DRAFT">DRAFT</option>
                     <option value="ACTIVE">ACTIVE</option>
                     <option value="BLOCKED">BLOCKED</option>
                     <option value="ARCHIVED">ARCHIVED</option>
                   </select>
-                </label>
-                <label>
-                  Change reason
-                  <input className="input" name="changeReason" placeholder="Why is this plan changing?" required />
-                </label>
+                </div>
+                <div className="input-group">
+                  <label className="input-label">Revision Rationale</label>
+                  <input className="os-input" name="changeReason" placeholder="Rationale for this snapshot..." required />
+                </div>
               </div>
-              <div className="actions-row">
-                <button className="button" type="submit">
-                  Append version
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1rem' }}>
+                <button className="os-button" type="submit" style={{ width: '220px' }}>
+                  APPEND_VERSION
                 </button>
               </div>
             </form>
           </Panel>
 
-          <Panel eyebrow="Plan conversion" title="Move strategy into execution">
-            <p>
-              Conversion creates a sprint under the linked project, derives phases from plan sections, derives tasks from plan actions, and
-              records dependency edges from action order.
+          <Panel eyebrow="Strategic Shift" title="Execution Conversion">
+            <p style={{ fontSize: '0.9rem', color: 'var(--text-graphite)', lineHeight: '1.6', marginBottom: '1.5rem' }}>
+              Converting this blueprint will instantiate a live sprint within the execution layer. 
+              Sections are mapped to phases, and actions are converted to truth-tracked tasks.
             </p>
             <form action={convertPlanToSprintAction}>
               <input name="planId" type="hidden" value={detail.plan.id} />
-              <div className="actions-row">
-                <button className="button" type="submit">
-                  Convert plan to sprint
-                </button>
-              </div>
+              <button className="os-button" type="submit" style={{ width: '100%', background: 'transparent', border: '1px solid var(--border-strong)', color: 'var(--text-silver)' }}>
+                INITIATE_CONVERSION
+              </button>
             </form>
-            {linkedSprints.length ? (
-              <div className="link-list">
-                {linkedSprints.map((sprint) => (
-                  <Link className="link-card" href={`/nex/sprints/${sprint.id}`} key={sprint.id}>
-                    {sprint.name}
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <p className="empty-state">No sprint has been derived from this plan yet.</p>
-            )}
+
+            <div style={{ marginTop: '2rem' }}>
+              <p style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '1rem' }}>Linked Sprints</p>
+              {linkedSprints.length ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {linkedSprints.map((sprint) => (
+                    <Link 
+                      key={sprint.id}
+                      href={`/nex/sprints/${sprint.id}`} 
+                      className="plan-card" 
+                      style={{ padding: '1rem 1.25rem', borderLeft: '3px solid var(--success)' }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>{sprint.name}</span>
+                        <StateBadge status={sprint.status} />
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div style={{ padding: '2rem', border: '1px dashed var(--border)', borderRadius: 'var(--radius-l)', textAlign: 'center' }}>
+                  <p style={{ color: 'var(--text-dim)', fontSize: '0.8rem' }}>No sprints instantiated from this blueprint.</p>
+                </div>
+              )}
+            </div>
           </Panel>
         </div>
 
-        <div className="page-grid two">
-          <Panel eyebrow="Plan structure" title="Sections and actions">
-            <div className="stack-list">
+        <div className="form-grid-2" style={{ marginTop: '2rem' }}>
+          <Panel eyebrow="Strategic Spine" title="Sections & Actions">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               {detail.sections.map(({ section, actions }) => (
-                <article className="stack-card" key={section.id}>
-                  <header>
+                <div key={section.id} className="plan-card" style={{ padding: '1.5rem' }}>
+                  <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
                     <div>
-                      <h3>
+                      <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-ivory)' }}>
                         {section.position}. {section.title}
                       </h3>
-                      <p>{section.intent}</p>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-graphite)', marginTop: '0.25rem' }}>{section.intent}</p>
                     </div>
-                    <span className="mono">{actions.length} actions</span>
+                    <span style={{ fontSize: '0.65rem', fontFamily: 'var(--font-mono)', color: 'var(--text-dim)', fontWeight: 700 }}>
+                      {actions.length} ACTIONS
+                    </span>
                   </header>
-                  <ul>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     {actions.map((action) => (
-                      <li key={action.id}>
-                        {action.title} · owner {action.ownerRef} · weight {action.priorityWeight}
-                      </li>
+                      <div key={action.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', padding: '0.5rem 0', borderTop: '1px solid var(--border)' }}>
+                        <span style={{ color: 'var(--text-silver)' }}>{action.title}</span>
+                        <span style={{ color: 'var(--text-dim)', fontSize: '0.7rem' }}>W:{action.priorityWeight} // {action.ownerRef}</span>
+                      </div>
                     ))}
-                  </ul>
-                </article>
+                  </div>
+                </div>
               ))}
             </div>
           </Panel>
 
-          <Panel eyebrow="Version history" title="Append-only snapshots">
-            <div className="version-list">
+          <Panel eyebrow="Audit Trail" title="Immutable History">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
               {detail.versions.map((version) => (
-                <article className="stack-card" key={version.id}>
-                  <header>
-                    <div>
-                      <h3>Version {version.versionNumber}</h3>
-                      <p>{version.changeReason}</p>
-                    </div>
-                    <span className="mono">{formatTimestamp(version.createdAt)}</span>
+                <div key={version.id} className="plan-card" style={{ padding: '1.5rem', borderLeft: '3px solid var(--border)' }}>
+                  <header style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
+                    <h3 style={{ fontSize: '0.9rem', fontWeight: 700 }}>SNAPSHOT_v{version.versionNumber}</h3>
+                    <span style={{ fontSize: '0.65rem', fontFamily: 'var(--font-mono)', color: 'var(--text-dim)' }}>
+                      {formatTimestamp(version.createdAt).toUpperCase()}
+                    </span>
                   </header>
-                  <p className="muted-text">Created by {version.createdBy}. Snapshot contains plan, sections, and actions.</p>
-                </article>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-silver)', lineHeight: '1.5' }}>{version.changeReason}</p>
+                  <div style={{ marginTop: '1rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border)', fontSize: '0.7rem', color: 'var(--text-dim)' }}>
+                    PERSISTED_BY: {version.createdBy.toUpperCase()}
+                  </div>
+                </div>
               ))}
             </div>
           </Panel>

@@ -1,5 +1,4 @@
 import Link from "next/link";
-
 import { Panel } from "../../../src/components/panel";
 import { StateBadge } from "../../../src/components/state-badge";
 import { ensureNexSeed, nexRuntime } from "../../../src/lib/nex-runtime";
@@ -20,83 +19,87 @@ export default async function GatesPage() {
   );
 
   return (
-    <div className="page-grid">
+    <div>
       <header className="route-header">
-        <div>
-          <p className="route-kicker">Sprint 02 / Gates and blockers</p>
-          <h1>Gates &amp; Blockers</h1>
-          <p className="route-copy">Blockers are now explicit objects in projections and gate decisions. Forward movement stops when truth says it should.</p>
-        </div>
+        <p className="route-kicker">Risk Governance</p>
+        <h1>Gates & Blockers</h1>
+        <p className="route-copy">
+          System governance ensures that forward movement stops when truth requirements are not met. Manage operational stalls and review the audit trail of gate decisions.
+        </p>
       </header>
 
-      <div className="page-grid two">
-        <Panel eyebrow="Blocked tasks" title="Open blocker inventory">
-          <div className="stack-list">
-            {blockedTasks.map((projection) => (
-              <article className="stack-card" key={projection.taskId}>
-                <header>
-                  <div>
-                    <h3>{projection.taskTitle}</h3>
-                    <p>{projection.nextRequiredAction}</p>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '2.5rem' }}>
+        <Panel eyebrow="Execution Stalls" title="Active Task Blockers">
+          {blockedTasks.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {blockedTasks.map((projection) => (
+                <div key={projection.taskId} style={{ padding: '1.25rem', background: 'rgba(239, 68, 68, 0.05)', borderLeft: '3px solid var(--danger)', borderRadius: 'var(--radius-l)' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                    <h3 style={{ fontSize: '1rem', fontWeight: 700 }}>{projection.taskTitle || "Unnamed Task"}</h3>
+                    <StateBadge status={projection.taskStatus} />
                   </div>
-                  <StateBadge status={projection.taskStatus} />
-                </header>
-                <ul>
-                  {projection.blockers.map((blocker) => (
-                    <li key={blocker}>{blocker}</li>
-                  ))}
-                </ul>
-                <Link className="link-card" href={`/nex/tasks/${projection.taskId}`}>
-                  Open task runtime
-                </Link>
-              </article>
-            ))}
-          </div>
-        </Panel>
-
-        <Panel eyebrow="Blocked phases" title="Phase-level impact">
-          {blockedPhases.length ? (
-            <div className="stack-list">
-              {blockedPhases.map((phase) => (
-                <article className="stack-card" key={phase.phaseId}>
-                  <h3>
-                    {phase.sprintName} / {phase.phaseName}
-                  </h3>
-                  <p>{phase.blockedTaskIds.length} blocked tasks</p>
-                </article>
+                  <ul style={{ paddingLeft: '1.25rem', marginBottom: '1rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                    {projection.blockers.map((blocker) => (
+                      <li key={blocker} style={{ marginBottom: '0.25rem' }}>{blocker}</li>
+                    ))}
+                  </ul>
+                  <Link href={`/nex/tasks/${projection.taskId}`} style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent)', textTransform: 'uppercase' }}>
+                    Inspect Task Runtime →
+                  </Link>
+                </div>
               ))}
             </div>
           ) : (
-            <p className="empty-state">No blocked phases are projected right now.</p>
+            <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '3rem 0' }}>All active tasks are currently clear.</p>
+          )}
+        </Panel>
+
+        <Panel eyebrow="Cascading Impact" title="Blocked Phases">
+          {blockedPhases.length > 0 ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              {blockedPhases.map((phase) => (
+                <div key={phase.phaseId} style={{ padding: '1rem', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-l)' }}>
+                  <p style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.25rem' }}>{phase.sprintName}</p>
+                  <p style={{ fontSize: '1rem', fontWeight: 600 }}>{phase.phaseName}</p>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--danger)', marginTop: '0.5rem' }}>{phase.blockedTaskIds.length} dependent tasks are stalled.</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '3rem 0' }}>No phase-level stalls projected.</p>
           )}
         </Panel>
       </div>
 
-      <Panel eyebrow="Gate decisions" title="Latest closure decisions">
-        <div className="stack-list">
-          {gateDecisions.map((decision) => (
-            <article className="stack-card" key={decision.id}>
-              <header>
-                <div>
-                  <h3>{decision.gateType}</h3>
-                  <p>{decision.rationale}</p>
+      <Panel eyebrow="Closure Trail" title="Gate Decisions">
+        {gateDecisions.length > 0 ? (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {gateDecisions.map((decision) => (
+              <div key={decision.id} style={{ padding: '1.25rem', background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius-l)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                  <div>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700 }}>{decision.gateType}</h3>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>{decision.rationale}</p>
+                  </div>
+                  <StateBadge status={decision.decision} />
                 </div>
-                <StateBadge status={decision.decision} />
-              </header>
-              {decision.blockers.length ? (
-                <ul>
-                  {decision.blockers.map((blocker) => (
-                    <li key={blocker}>{blocker}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="empty-state">This decision has no recorded blockers.</p>
-              )}
-            </article>
-          ))}
-        </div>
+                {decision.blockers.length > 0 && (
+                  <div style={{ marginTop: '1rem', padding: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: 'var(--radius-m)' }}>
+                    <p style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Resolved Blockers</p>
+                    <ul style={{ paddingLeft: '1.25rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      {decision.blockers.map((blocker) => (
+                        <li key={blocker}>{blocker}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '3rem 0' }}>No gate closure decisions recorded.</p>
+        )}
       </Panel>
     </div>
   );
 }
-

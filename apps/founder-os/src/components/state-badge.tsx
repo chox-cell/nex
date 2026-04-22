@@ -5,16 +5,16 @@ interface StateBadgeProps {
 }
 
 export function StateBadge({ status }: StateBadgeProps) {
-  const toneClass = status.toLowerCase().includes("fail")
-    ? "badge badge-fail"
-    : status.toLowerCase().includes("block")
-      ? "badge badge-blocked"
-      : status.toLowerCase().includes("active") || status.toLowerCase().includes("progress")
-        ? "badge badge-active"
-        : status.toLowerCase().includes("done") || status.toLowerCase().includes("verified") || status.toLowerCase().includes("stable")
-          ? "badge badge-done"
-          : "badge badge-muted";
+  const s = status.toLowerCase();
+  
+  let toneClass = "badge-muted";
+  if (s.includes("fail") || s.includes("block")) toneClass = "badge-fail";
+  else if (s.includes("active") || s.includes("progress")) toneClass = "badge-active";
+  else if (s.includes("done") || s.includes("verified") || s.includes("stable") || s.includes("go")) toneClass = "badge-done";
 
-  return <span className={toneClass}>{formatStatus(status)}</span>;
+  return (
+    <span className={`badge ${toneClass}`}>
+      {formatStatus(status)}
+    </span>
+  );
 }
-

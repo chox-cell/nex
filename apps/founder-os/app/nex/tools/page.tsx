@@ -1,5 +1,4 @@
 import type { ToolProvider, ToolProviderConfigValue } from "@nex/core";
-
 import { Panel } from "../../../src/components/panel";
 import { StateBadge } from "../../../src/components/state-badge";
 import { ensureNexSeed, nexRuntime } from "../../../src/lib/nex-runtime";
@@ -11,24 +10,6 @@ function formatCapability(capability: string): string {
     .join(" ");
 }
 
-function formatConfig(config: ToolProvider["config"]): string {
-  return Object.entries(config)
-    .map(([key, value]) => `${key}=${formatConfigValue(value)}`)
-    .join(", ");
-}
-
-function formatConfigValue(value: ToolProviderConfigValue): string {
-  if (typeof value === "boolean") {
-    return value ? "true" : "false";
-  }
-
-  if (value === null) {
-    return "null";
-  }
-
-  return String(value);
-}
-
 export default async function ToolsPage() {
   await ensureNexSeed();
   const registry = await nexRuntime.services.tools.getFounderRegistrySummary();
@@ -38,122 +19,68 @@ export default async function ToolsPage() {
   }
 
   return (
-    <div className="page-grid">
+    <div>
       <header className="route-header">
-        <div>
-          <p className="route-kicker">Sprint 03 / Tool provider registry</p>
-          <h1>Tools</h1>
-          <p className="route-copy">
-            NEX now persists the founder tool registry as canonical state. A provider can be configured inside NEX without being treated as a
-            connected truth source or an automation surface.
-          </p>
-        </div>
+        <p className="route-kicker">Automation Registry</p>
+        <h1>Tools</h1>
+        <p className="route-copy">
+          The canonical registry of tool providers and active connectors. Manage provider configuration and truth surface assignments within the founder workspace.
+        </p>
       </header>
 
-      <section className="metric-grid">
-        <article className="metric-card">
-          <span className="panel-eyebrow">Providers</span>
-          <strong>{registry.providers.length}</strong>
-          <p>Seeded founder work surfaces tracked inside the SSOT.</p>
-        </article>
-        <article className="metric-card">
-          <span className="panel-eyebrow">Configured</span>
-          <strong>{registry.statusCounts.configured}</strong>
-          <p>Registry-backed providers with explicit metadata but no implied live connector.</p>
-        </article>
-        <article className="metric-card">
-          <span className="panel-eyebrow">Planned</span>
-          <strong>{registry.statusCounts.planned}</strong>
-          <p>Providers reserved for later Sprint 03 phases once their backing structures exist.</p>
-        </article>
-        <article className="metric-card">
-          <span className="panel-eyebrow">Truth surfaces</span>
-          <strong>{registry.truthSurfaceCount}</strong>
-          <p>Providers marked as future proof surfaces, not active truth owners.</p>
-        </article>
-      </section>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '2.5rem' }}>
+        {[
+          { label: "Active Providers", value: registry.providers.length },
+          { label: "Configured State", value: registry.statusCounts.configured },
+          { label: "Planned Integration", value: registry.statusCounts.planned },
+          { label: "Truth Surfaces", value: registry.truthSurfaceCount },
+        ].map((stat) => (
+          <div key={stat.label} style={{ padding: '1.25rem', background: 'var(--bg-graphite)', border: '1px solid var(--border)', borderRadius: 'var(--radius-l)' }}>
+            <p style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '0.5rem', letterSpacing: '0.05em' }}>{stat.label}</p>
+            <p style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-ivory)' }}>{stat.value}</p>
+          </div>
+        ))}
+      </div>
 
-      <div className="page-grid two">
-        <Panel
-          eyebrow="Provider registry"
-          title="Seeded founder tools"
-          description="These records come from the canonical founder workspace seed and remain queryable through the ToolProviderService."
-        >
-          <div className="stack-list">
+      <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: '1.5rem' }}>
+        <Panel eyebrow="Seeded Infrastructure" title="Provider Registry">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
             {registry.providers.map((provider) => (
-              <article className="stack-card" key={provider.id}>
-                <header>
+              <div key={provider.id} className="plan-card">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
                   <div>
-                    <h3>{provider.name}</h3>
-                    <p>{provider.providerType}</p>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-ivory)' }}>{provider.name}</h3>
+                    <p style={{ fontSize: '0.7rem', color: 'var(--text-dim)', fontFamily: 'var(--font-mono)', marginTop: '0.25rem' }}>{provider.providerType}</p>
                   </div>
                   <StateBadge status={provider.status} />
-                </header>
-                <dl className="detail-list">
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border)' }}>
                   <div>
-                    <dt>Capabilities</dt>
-                    <dd>{provider.capabilities.map(formatCapability).join(", ")}</dd>
+                    <p style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '0.35rem' }}>Capabilities</p>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-silver)' }}>{provider.capabilities.map(formatCapability).join(", ")}</p>
                   </div>
                   <div>
-                    <dt>Truth surface</dt>
-                    <dd>{provider.capabilities.includes("proof_surface") || provider.capabilities.includes("repo_truth") ? "Yes" : "No"}</dd>
+                    <p style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '0.35rem' }}>Truth Role</p>
+                    <p style={{ fontSize: '0.85rem', color: 'var(--text-silver)' }}>{provider.capabilities.includes("proof_surface") ? "Canonical Proof Surface" : "General Automation"}</p>
                   </div>
-                  <div>
-                    <dt>Config</dt>
-                    <dd className="mono">{formatConfig(provider.config)}</dd>
-                  </div>
-                </dl>
-              </article>
+                </div>
+              </div>
             ))}
           </div>
         </Panel>
 
-        <Panel
-          eyebrow="Registry rules"
-          title="Status model"
-          description="Provider status describes NEX-side readiness only. It does not imply external auth or tool-native truth ownership."
-        >
-          <div className="stack-list">
-            <article className="stack-card">
-              <header>
-                <div>
-                  <h3>Configured</h3>
-                  <p>Metadata and expected role are persisted in NEX.</p>
-                </div>
-                <StateBadge status="configured" />
-              </header>
-              <p className="muted-text">Use this when the provider is modeled inside NEX, but deeper packet, proof, or connector work is still gated.</p>
-            </article>
-            <article className="stack-card">
-              <header>
-                <div>
-                  <h3>Planned</h3>
-                  <p>The provider is intentionally reserved for a later phase.</p>
-                </div>
-                <StateBadge status="planned" />
-              </header>
-              <p className="muted-text">This prevents fake “connected” states before manual packet logging, truth surfaces, or connector contracts exist.</p>
-            </article>
-            <article className="stack-card">
-              <header>
-                <div>
-                  <h3>Active</h3>
-                  <p>Reserved for providers with real backing structure.</p>
-                </div>
-                <StateBadge status="active" />
-              </header>
-              <p className="muted-text">No provider is marked active in Phase 1 because no live connector or proof surface has been fully modeled yet.</p>
-            </article>
-            <article className="stack-card">
-              <header>
-                <div>
-                  <h3>Inactive</h3>
-                  <p>Reserved for intentionally disabled providers.</p>
-                </div>
-                <StateBadge status="inactive" />
-              </header>
-              <p className="muted-text">The registry already understands the state, even though the founder workspace does not need disabled providers yet.</p>
-            </article>
+        <Panel eyebrow="Governance" title="Integration Model">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            <div>
+              <StateBadge status="configured" />
+              <p style={{ fontWeight: 700, fontSize: '0.9rem', margin: '0.75rem 0 0.25rem 0' }}>Configuration Locked</p>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Metadata and role definitions are persisted. The provider is ready for packet and proof sync.</p>
+            </div>
+            <div>
+              <StateBadge status="planned" />
+              <p style={{ fontWeight: 700, fontSize: '0.9rem', margin: '0.75rem 0 0.25rem 0' }}>Reserved Interface</p>
+              <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Integration is intentionally reserved for a future execution phase to prevent stale truth sync.</p>
+            </div>
           </div>
         </Panel>
       </div>
