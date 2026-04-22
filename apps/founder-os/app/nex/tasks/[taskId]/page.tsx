@@ -82,7 +82,7 @@ export default async function TaskDetailPage({ params }: TaskDetailPageProps) {
         </header>
 
         {/* TIER 1: EXECUTION FOCUS */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '1.5fr', marginBottom: '2.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '2rem', marginBottom: '2.5rem' }}>
           <Panel eyebrow="Strategic Action" title="Next Required Move">
             <div style={{ padding: '1.5rem', background: 'var(--bronze-muted)', border: '1px solid var(--bronze)', borderRadius: 'var(--radius-l)' }}>
               <p style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--text-ivory)', marginBottom: '1.5rem', lineHeight: '1.6' }}>

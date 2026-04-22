@@ -11,10 +11,12 @@ const AGENT_TASKS = [
 ];
 
 export function SystemTaskbar() {
+  const [isMounted, setIsMounted] = useState(false);
   const [time, setTime] = useState<string | null>(null);
   const [activeAgents, setActiveAgents] = useState<{ id: string, task: string }[]>([]);
 
   useEffect(() => {
+    setIsMounted(true);
     setTime(new Date().toLocaleTimeString());
     const timer = setInterval(() => {
       setTime(new Date().toLocaleTimeString());
@@ -39,7 +41,7 @@ export function SystemTaskbar() {
       <div className="system-status-pill">
         <span className="mono-telemetry" style={{ color: 'var(--success)', opacity: 0.8 }}>SYSTEM: READY</span>
         <span style={{ opacity: 0.2 }}>|</span>
-        <span className="mono-telemetry">TRUTH VELOCITY: <span style={{ color: 'var(--text-ivory)' }}>94.2%</span></span>
+        <span className="mono-telemetry">TRUTH VELOCITY: <span style={{ color: 'var(--text-ivory)' }}>{isMounted ? "SYNCED" : "..."}</span></span>
       </div>
 
       <div className="agents-work-feed">

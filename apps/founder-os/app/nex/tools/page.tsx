@@ -35,9 +35,9 @@ export default async function ToolsPage() {
           { label: "Planned Integration", value: registry.statusCounts.planned },
           { label: "Truth Surfaces", value: registry.truthSurfaceCount },
         ].map((stat) => (
-          <div key={stat.label} style={{ padding: '1.25rem', background: 'var(--bg-graphite)', border: '1px solid var(--border)', borderRadius: 'var(--radius-l)' }}>
-            <p style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '0.5rem', letterSpacing: '0.05em' }}>{stat.label}</p>
-            <p style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--text-ivory)' }}>{stat.value}</p>
+          <div key={stat.label} style={{ padding: '2rem', background: 'var(--bg-graphite)', border: '1px solid var(--border)', borderRadius: 'var(--radius-l)' }}>
+            <p style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-dim)', textTransform: 'uppercase', marginBottom: '0.75rem', letterSpacing: '0.05em' }}>{stat.label}</p>
+            <p style={{ fontSize: '2.2rem', fontWeight: 900, color: 'var(--text-ivory)' }}>{stat.value}</p>
           </div>
         ))}
       </div>

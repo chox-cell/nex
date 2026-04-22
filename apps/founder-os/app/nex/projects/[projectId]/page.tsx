@@ -31,15 +31,15 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '3rem' }}>
           <Panel eyebrow="Execution Focus" title="Active Sprint">
             {detail.activeSprint ? (
-              <div style={{ padding: '1.5rem', background: 'var(--bronze-muted)', border: '1px solid var(--bronze)', borderRadius: 'var(--radius-l)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                  <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-ivory)' }}>{detail.activeSprint.name}</h3>
+              <div style={{ padding: '2rem', background: 'var(--bronze-muted)', border: '1px solid var(--bronze)', borderRadius: 'var(--radius-l)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-ivory)' }}>{detail.activeSprint.name}</h3>
                   <StateBadge status={detail.activeSprint.status} />
                 </div>
-                <p style={{ fontSize: '0.95rem', color: 'var(--text-silver)', marginBottom: '1.5rem', lineHeight: '1.5' }}>
+                <p style={{ fontSize: '0.95rem', color: 'var(--text-silver)', marginBottom: '2rem', lineHeight: '1.6' }}>
                   {detail.activeSprint.goal}
                 </p>
-                <Link href={`/nex/sprints/${detail.activeSprint.id}`} style={{ display: 'block', textAlign: 'center', padding: '0.75rem', background: 'var(--bronze)', color: '#000', fontWeight: 800, borderRadius: 'var(--radius-m)', textDecoration: 'none', fontSize: '0.85rem' }}>
+                <Link href={`/nex/sprints/${detail.activeSprint.id}`} className="os-button" style={{ width: '100%', textDecoration: 'none' }}>
                   ENTER_SPRINT_RUNTIME
                 </Link>
               </div>
@@ -81,12 +81,12 @@ export default async function ProjectDetailPage({ params }: ProjectDetailPagePro
           {detail.sprints.length > 0 ? (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1.25rem' }}>
               {detail.sprints.map((sprint) => (
-                <Link key={sprint.id} href={`/nex/sprints/${sprint.id}`} style={{ padding: '1.25rem', background: 'var(--bg-graphite)', border: '1px solid var(--border)', borderRadius: 'var(--radius-l)', display: 'block', transition: 'all 200ms ease' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                    <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--text-ivory)' }}>{sprint.name}</h3>
+                <Link key={sprint.id} href={`/nex/sprints/${sprint.id}`} className="plan-card" style={{ padding: '2rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                    <h3 style={{ fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-ivory)' }}>{sprint.name}</h3>
                     <StateBadge status={sprint.status} />
                   </div>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--text-silver)', lineHeight: '1.4' }}>{sprint.goal}</p>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-silver)', lineHeight: '1.5' }}>{sprint.goal}</p>
                 </Link>
               ))}
             </div>

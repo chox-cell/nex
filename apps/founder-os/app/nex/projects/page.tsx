@@ -32,11 +32,11 @@ export default async function ProjectsPage() {
               const projection = projections.find((candidate) => candidate.projectId === entry.project.id);
 
               return (
-                <Link key={entry.project.id} href={`/nex/projects/${entry.project.id}`} className="plan-card" style={{ borderLeft: '3px solid var(--border-strong)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
+                <Link key={entry.project.id} href={`/nex/projects/${entry.project.id}`} className="plan-card" style={{ borderLeft: '3px solid var(--border-strong)', padding: '2.5rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
                     <div>
-                      <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-ivory)' }}>{entry.project.name || "Unnamed Project"}</h3>
-                      <p style={{ fontSize: '0.85rem', color: 'var(--text-graphite)', marginTop: '0.25rem', lineHeight: '1.4' }}>{entry.project.summary || "No project summary provided."}</p>
+                      <h3 style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--text-ivory)' }}>{entry.project.name || "Unnamed Project"}</h3>
+                      <p style={{ fontSize: '0.85rem', color: 'var(--text-graphite)', marginTop: '0.5rem', lineHeight: '1.5' }}>{entry.project.summary || "No project summary provided."}</p>
                     </div>
                     <StateBadge status={entry.project.status} />
                   </div>
@@ -61,8 +61,8 @@ export default async function ProjectsPage() {
                     </span>
                   </div>
                   
-                  <div style={{ marginTop: '1.5rem', textAlign: 'right' }}>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--bronze)', textTransform: 'uppercase' }}>OPEN_BOARD →</span>
+                  <div style={{ marginTop: '2rem', textAlign: 'right' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--bronze)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>OPEN_BOARD →</span>
                   </div>
                 </Link>
               );
