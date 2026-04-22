@@ -1,0 +1,23 @@
+{
+  "name": "founder-os",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm seed && next dev",
+    "build": "pnpm seed && next build",
+    "start": "next start",
+    "seed": "tsx ./scripts/seed-founder-os.ts",
+    "proof:sprint-01": "tsx ./scripts/proof-sprint-01.ts",
+    "proof:sprint-02": "tsx ./scripts/proof-sprint-02.ts",
+    "proof:sprint-03-phase-01": "tsx ./scripts/proof-sprint-03-phase-01.ts",
+    "proof:sprint-03-phase-02": "tsx ./scripts/proof-sprint-03-phase-02.ts",
+    "proof:sprint-03-phase-03": "tsx ./scripts/proof-sprint-03-phase-03.ts",
+    "proof:sprint-03-phase-04": "tsx ./scripts/proof-sprint-03-phase-04.ts"
+  },
+  "dependencies": {
+    "@nex/core": "workspace:*",
+    "@nex/ssot": "workspace:*",
+    "next": "^16.0.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "@nex/ssot",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "scripts": {
+    "test": "tsx --test ./src/*.test.ts"
+  },
+  "dependencies": {
+    "@nex/core": "workspace:*"
+  }
+}

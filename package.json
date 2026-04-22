@@ -1,0 +1,21 @@
+{
+  "name": "nex-founder-os",
+  "private": true,
+  "packageManager": "pnpm@10.28.0",
+  "scripts": {
+    "dev": "pnpm --filter founder-os dev",
+    "build": "pnpm --filter founder-os build",
+    "start": "pnpm --filter founder-os start",
+    "seed": "pnpm --filter founder-os seed",
+    "test": "pnpm --filter @nex/ssot test",
+    "verify:sprint-01": "pnpm seed && pnpm test && pnpm build && pnpm --filter founder-os proof:sprint-01",
+    "verify:sprint-02": "pnpm seed && pnpm test && pnpm build && pnpm --filter founder-os proof:sprint-02"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "tsx": "^4.20.3",
+    "typescript": "^5.9.3"
+  }
+}
