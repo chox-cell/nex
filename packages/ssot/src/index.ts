@@ -30,3 +30,5 @@ export * from "./services/tool-packet-service";
 export * from "./services/tool-provider-service";
 export * from "./services/truth-sync-service";
 export * from "./services/verification-service";
+export * from "./services/command-center-service";
+

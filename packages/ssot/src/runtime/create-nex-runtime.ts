@@ -46,6 +46,8 @@ import { ToolPacketService } from "../services/tool-packet-service";
 import { ToolProviderService } from "../services/tool-provider-service";
 import { TruthSyncService } from "../services/truth-sync-service";
 import { VerificationService } from "../services/verification-service";
+import { CommandCenterService } from "../services/command-center-service";
+
 
 export function createNexRuntime(filePath: string) {
   const store = new FileNexStore(filePath);
@@ -103,6 +105,7 @@ export function createNexRuntime(filePath: string) {
     snapshots: null as unknown as SnapshotService,
     governance: null as unknown as TaskGovernanceService,
     seed: null as unknown as FounderSeedService,
+    commandCenter: null as unknown as CommandCenterService,
   };
 
   services.events = new EventService(repositories.events);
@@ -163,6 +166,13 @@ export function createNexRuntime(filePath: string) {
     repositories.decisions,
   );
   services.evidence = new EvidenceService(repositories.evidence, services.scope, services.events, services.sync);
+  services.commandCenter = new CommandCenterService(
+    services.mission,
+    services.projections,
+    services.tools,
+    services.execution,
+  );
+
   services.codexConnector = new CodexConnectorService(
     repositories.codexResults,
     repositories.toolProviders,

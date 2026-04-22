@@ -429,3 +429,68 @@ button {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* NEX Command Center */
+.command-center-layout {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.cc-col {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.mono-block {
+  display: block;
+  padding: 1rem;
+  background: rgba(53, 43, 22, 0.05);
+  border-radius: 12px;
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-size: 0.85rem;
+  border: 1px solid var(--line);
+  overflow-x: auto;
+  color: var(--muted);
+}
+
+.next-move-context {
+  padding: 1.2rem;
+  background: rgba(142, 79, 32, 0.06);
+  border-left: 4px solid var(--accent);
+  border-radius: 12px;
+}
+
+.next-move-reason {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.next-move-action-indicator {
+  display: inline-block;
+  padding: 0.3rem 0.6rem;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--font-ibm-plex-mono), monospace;
+  font-weight: 700;
+  font-size: 0.7rem;
+  border-radius: 4px;
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 1200px) {
+  .command-center-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 800px) {
+  .command-center-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
